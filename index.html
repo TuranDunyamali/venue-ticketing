@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grand Aurora Theatre – Ticket Selection</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Grand Aurora Theatre</h1>
+    <p>Select your seats – click a seat to inspect it, then press <strong>Add to cart</strong>.</p>
+  </header>
+
+  <main class="layout">
+    <section class="map-panel" aria-label="Venue map">
+      <ul class="legend" id="legend" aria-label="Legend"></ul>
+
+      <div class="map-wrap">
+        <div id="viewport" class="viewport" aria-label="Seating map (drag to pan, wheel to zoom)">
+          <div id="world" class="world"></div>
+        </div>
+
+        <div class="controls" role="group" aria-label="Map controls">
+          <button type="button" id="zoomIn"  aria-label="Zoom in">+</button>
+          <button type="button" id="zoomOut" aria-label="Zoom out">?</button>
+          <button type="button" id="moveUp"    aria-label="Move up">^</button>
+          <button type="button" id="moveLeft"  aria-label="Move left"><</button>
+          <button type="button" id="reset"     aria-label="Reset and center view" class="reset">¦</button>
+          <button type="button" id="moveRight" aria-label="Move right">></button>
+          <button type="button" id="moveDown"  aria-label="Move down">v</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="card" aria-live="polite">
+        <h2>Seat details</h2>
+        <div id="details" class="details">
+          <p class="muted">No seat selected. Click a seat on the map.</p>
+        </div>
+        <button type="button" id="addBtn" class="primary" disabled>ADD TO CART</button>
+        <p id="message" class="message" role="status"></p>
+      </section>
+
+      <section class="card">
+        <h2>Cart <span id="cartCount" class="badge">0</span></h2>
+        <ul id="cartList" class="cart-list"></ul>
+        <p id="cartEmpty" class="muted">Your cart is empty.</p>
+        <div class="total"><span>Total</span><strong id="total">$0</strong></div>
+        <button type="button" id="clearBtn" class="secondary">Clear cart</button>
+      </section>
+    </aside>
+  </main>
+
+  <script src="venue-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
