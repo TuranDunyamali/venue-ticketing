@@ -97,3 +97,73 @@ function renderLegend() {
     ul.appendChild(li);
   });
 }
+/* ---------- Seat state / UI sync ---------- */
+
+function seatState(s) {
+  if (s.unavailable) return "unavailable";
+  return cart.includes(s.id) ? "in-cart" : "available";
+}
+
+function seatLabel(s) {
+  return `${s.sectionName}, row ${s.row}, seat ${s.number}`;
+}
+
+function refreshSeat(id) {
+  const s = seats.get(id), b = seatEls.get(id);
+  if (!s || !b) return;
+  const state = seatState(s);
+  b.classList.toggle("unavailable", state === "unavailable");
+  b.classList.toggle("in-cart", state === "in-cart");
+  b.classList.toggle("inspected", id === inspectedId);
+  b.setAttribute("aria-disabled", state === "unavailable");
+  b.setAttribute("aria-pressed", id === inspectedId);
+  b.setAttribute("aria-label", `${seatLabel(s)}, ${money(s.price)}, ${state.replace("-", " ")}`);
+}
+
+function renderDetails() {
+  const box = $("details"), btn = $("addBtn");
+  const s = seats.get(inspectedId);
+  if (!s) {
+    box.innerHTML = "<p class="muted">No seat selected. Click a seat on the map.</p>";
+    btn.disabled = true; btn.textContent = "ADD TO CART";
+    return;
+  }
+  const state = seatState(s);
+  const label = { available: "Available", "in-cart": "In your cart", unavailable: "Unavailable" }[state];
+  box.innerHTML = `<dl>
+    <dt>Section</dt><dd>${s.sectionName}</dd>
+    <dt>Row</dt><dd>${s.row}</dd>
+    <dt>Seat</dt><dd>${s.number}</dd>
+    <dt>Category</dt><dd>${s.category.name}</dd>
+    <dt>Price</dt><dd>${money(s.price)}</dd>
+    <dt>Status</dt><dd><span class="status ${state}">${label}</span></dd>
+  </dl>`;
+  btn.disabled = state !== "available";
+  btn.textContent = state === "in-cart" ? "ALREADY IN CART" : state === "unavailable" ? "UNAVAILABLE" : "ADD TO CART";
+}
+
+function renderCart() {
+  const list = $("cartList");
+  list.innerHTML = "";
+  let total = 0;
+  cart.forEach((id) => {
+    const s = seats.get(id);
+    total += s.price;
+    const li = el("li");
+    const info = el("div", "info");
+    info.appendChild(document.createTextNode(`${s.sectionName} · ${s.row}${s.number}`));
+    info.appendChild(el("small", null, null, `${s.category.name} · ${money(s.price)}`));
+    const rm = el("button", "remove", null, "Remove");
+    rm.type = "button";
+    rm.dataset.id = id;
+    rm.setAttribute("aria-label", `Remove ${seatLabel(s)} from cart`);
+    li.append(info, rm);
+    list.appendChild(li);
+  });
+  $("cartCount").textContent = cart.length;
+  $("cartEmpty").hidden = cart.length > 0;
+  $("total").textContent = money(total);
+  $("clearBtn").disabled = cart.length === 0;
+}
+
+function say(msg) { $("message").textContent = msg; }
