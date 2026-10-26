@@ -167,3 +167,18 @@ function renderCart() {
 }
 
 function say(msg) { $("message").textContent = msg; }
+
+/* ---------- Persistence ---------- */
+
+function saveCart() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cart)); } catch (e) { /* storage unavailable */ }
+}
+
+function loadCart() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!Array.isArray(data)) return [];
+    // keep only valid, available, unique seats
+    return [...new Set(data)].filter((id) => seats.has(id) && !seats.get(id).unavailable);
+  } catch (e) { return []; }
+}
