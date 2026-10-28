@@ -182,3 +182,50 @@ function loadCart() {
     return [...new Set(data)].filter((id) => seats.has(id) && !seats.get(id).unavailable);
   } catch (e) { return []; }
 }
+
+/* ---------- Actions ---------- */
+
+function inspect(id) {
+  const prev = inspectedId;
+  inspectedId = id;
+  if (prev) refreshSeat(prev);
+  refreshSeat(id);
+  renderDetails();
+  say(seats.get(id).unavailable ? "This seat is unavailable and cannot be added." : "");
+}
+
+function addToCart() {
+  const s = seats.get(inspectedId);
+  if (!s) return;
+  if (s.unavailable) return say("This seat is unavailable.");
+  if (cart.includes(s.id)) return say("That seat is already in your cart.");
+  cart.push(s.id);
+  saveCart();
+  refreshSeat(s.id);
+  renderCart(); renderDetails();
+  say(`Added ${seatLabel(s)}.`);
+}
+
+function removeFromCart(id) {
+  cart = cart.filter((x) => x !== id);
+  saveCart();
+  refreshSeat(id);
+  renderCart(); renderDetails();
+  say("Ticket removed.");
+}
+
+world.addEventListener("click", (e) => {
+  const b = e.target.closest(".seat");
+  if (b) inspect(b.dataset.id);
+});
+$("addBtn").addEventListener("click", addToCart);
+$("cartList").addEventListener("click", (e) => {
+  const b = e.target.closest(".remove");
+  if (b) removeFromCart(b.dataset.id);
+});
+$("clearBtn").addEventListener("click", () => {
+  const ids = cart.slice();
+  cart = []; saveCart();
+  ids.forEach(refreshSeat);
+  renderCart(); renderDetails(); say("Cart cleared.");
+});
