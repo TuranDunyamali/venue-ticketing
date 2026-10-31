@@ -229,3 +229,70 @@ $("clearBtn").addEventListener("click", () => {
   ids.forEach(refreshSeat);
   renderCart(); renderDetails(); say("Cart cleared.");
 });
+
+/* ---------- Pan & zoom ---------- */
+
+const view = { scale: 1, x: 0, y: 0, fit: 1 };
+const MAX_SCALE = 3, STEP = 1.25;
+
+function fitScale() {
+  return Math.min(viewport.clientWidth / VENUE.width, viewport.clientHeight / VENUE.height);
+}
+
+function clamp() {
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const w = VENUE.width * view.scale, h = VENUE.height * view.scale;
+  view.x = w <= vw ? (vw - w) / 2 : Math.min(0, Math.max(vw - w, view.x));
+  view.y = h <= vh ? (vh - h) / 2 : Math.min(0, Math.max(vh - h, view.y));
+}
+
+function apply() {
+  clamp();
+  world.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
+}
+
+function zoomAt(factor, cx, cy) {
+  const next = Math.min(MAX_SCALE, Math.max(view.fit, view.scale * factor));
+  const k = next / view.scale;
+  view.x = cx - (cx - view.x) * k;
+  view.y = cy - (cy - view.y) * k;
+  view.scale = next;
+  apply();
+}
+
+function resetView() {
+  view.fit = fitScale();
+  view.scale = view.fit;
+  view.x = view.y = 0;
+  apply();
+}
+
+function pan(dx, dy) { view.x += dx; view.y += dy; apply(); }
+
+const center = () => [viewport.clientWidth / 2, viewport.clientHeight / 2];
+$("zoomIn").onclick = () => zoomAt(STEP, ...center());
+$("zoomOut").onclick = () => zoomAt(1 / STEP, ...center());
+// "Move up" shows content further up the map, i.e. the world moves down.
+$("moveUp").onclick = () => pan(0, 100);
+$("moveDown").onclick = () => pan(0, -100);
+$("moveLeft").onclick = () => pan(100, 0);
+$("moveRight").onclick = () => pan(-100, 0);
+$("reset").onclick = resetView;
+
+window.addEventListener("resize", () => {
+  const wasFit = Math.abs(view.scale - view.fit) < 1e-6;
+  view.fit = fitScale();
+  if (wasFit || view.scale < view.fit) view.scale = view.fit;
+  apply();
+});
+
+/* ---------- Init ---------- */
+
+buildModel();
+renderLegend();
+renderMap();
+cart = loadCart();
+seats.forEach((_, id) => refreshSeat(id));
+renderCart();
+renderDetails();
+resetView();
