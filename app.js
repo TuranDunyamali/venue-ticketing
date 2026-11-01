@@ -296,3 +296,8 @@ seats.forEach((_, id) => refreshSeat(id));
 renderCart();
 renderDetails();
 resetView();
+world.addEventListener("click", (e) => {
+  if (dragMoved) return; // click that ended a drag
+  const b = e.target.closest(".seat");
+  if (b) inspect(b.dataset.id);
+});
