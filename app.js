@@ -301,3 +301,29 @@ world.addEventListener("click", (e) => {
   const b = e.target.closest(".seat");
   if (b) inspect(b.dataset.id);
 });
+viewport.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  const r = viewport.getBoundingClientRect();
+  zoomAt(e.deltaY < 0 ? 1.15 : 1 / 1.15, e.clientX - r.left, e.clientY - r.top);
+}, { passive: false });
+
+let drag = null, dragMoved = false;
+viewport.addEventListener("pointerdown", (e) => {
+  if (e.button !== 0) return;
+  drag = { sx: e.clientX, sy: e.clientY, ox: view.x, oy: view.y };
+  dragMoved = false;
+});
+window.addEventListener("pointermove", (e) => {
+  if (!drag) return;
+  const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+  if (!dragMoved && Math.hypot(dx, dy) < 5) return;
+  dragMoved = true;
+  viewport.classList.add("dragging");
+  view.x = drag.ox + dx; view.y = drag.oy + dy;
+  apply();
+});
+window.addEventListener("pointerup", () => {
+  drag = null;
+  viewport.classList.remove("dragging");
+  setTimeout(() => { dragMoved = false; }, 0); 
+});
