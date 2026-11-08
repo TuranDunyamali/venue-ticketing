@@ -65,7 +65,7 @@ function renderMap() {
   VENUE.sections.forEach((sec) => {
     const cat = VENUE.categories[sec.category];
     frag.appendChild(el("div", "section-label", { left: sec.x + 16 + "px", top: sec.y - 20 + "px" },
-      `${sec.name} · ${cat.name} ${money(cat.price)}`));
+      `${sec.name} ï¿½ ${cat.name} ${money(cat.price)}`));
     for (let r = 0; r < sec.rows; r++) {
       frag.appendChild(el("div", "row-label", { left: sec.x + "px", top: sec.y + r * pitch + "px" },
         String.fromCharCode(sec.firstRow.charCodeAt(0) + r)));
@@ -124,7 +124,7 @@ function renderDetails() {
   const box = $("details"), btn = $("addBtn");
   const s = seats.get(inspectedId);
   if (!s) {
-    box.innerHTML = "<p class="muted">No seat selected. Click a seat on the map.</p>";
+    box.innerHTML = '<p class="muted">No seat selected. Click a seat on the map.</p>';
     btn.disabled = true; btn.textContent = "ADD TO CART";
     return;
   }
@@ -151,8 +151,8 @@ function renderCart() {
     total += s.price;
     const li = el("li");
     const info = el("div", "info");
-    info.appendChild(document.createTextNode(`${s.sectionName} · ${s.row}${s.number}`));
-    info.appendChild(el("small", null, null, `${s.category.name} · ${money(s.price)}`));
+    info.appendChild(document.createTextNode(`${s.sectionName} ï¿½ ${s.row}${s.number}`));
+    info.appendChild(el("small", null, null, `${s.category.name} ï¿½ ${money(s.price)}`));
     const rm = el("button", "remove", null, "Remove");
     rm.type = "button";
     rm.dataset.id = id;
